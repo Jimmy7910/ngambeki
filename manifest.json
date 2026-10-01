@@ -1,0 +1,24 @@
+{
+  "name": "Ngambeki — Internet ya Kukusaidia",
+  "short_name": "Ngambeki",
+  "description": "Ngambeki ni internet ya kukusaidia kupata taarifa, kufanya mambo kwa urahisi na kuelewa dunia.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020817",
+  "theme_color": "#020817",
+  "orientation": "portrait",
+  "lang": "sw",
+  "categories": [
+    "education",
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

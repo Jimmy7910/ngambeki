@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ngambeki — Internet ya Kukusaidia</title>
+
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#020817">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  color:#fff;
+  background:#020817;
+  overflow-x:hidden;
+}
+.language-selector{
+    position:absolute;
+    top:18px;
+    right:18px;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.language-selector select{
+    padding:8px 12px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.25);
+    background:rgba(255,255,255,0.12);
+    color:#fff;
+    font-size:14px;
+    outline:none;
+    backdrop-filter:blur(10px);
+    cursor:pointer;
+}
+
+.language-selector select option{
+    color:#111;
+    background:#fff;
+}
+/* Animated background */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-50%;
+  z-index:-2;
+  background:
+    radial-gradient(circle at 20% 20%,#0757a6 0,transparent 25%),
+    radial-gradient(circle at 80% 30%,#073b72 0,transparent 25%),
+    radial-gradient(circle at 50% 90%,#064e48 0,transparent 30%);
+  animation:moveBackground 120s ease-in-out infinite alternate;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  background:linear-gradient(
+    135deg,
+    rgba(2,8,23,.78),
+    rgba(3,25,55,.72),
+    rgba(2,20,30,.82)
+  );
+}
+
+@keyframes moveBackground{
+  from{
+    transform:translate(-3%,-2%) scale(1);
+  }
+  to{
+    transform:translate(3%,2%) scale(1.08);
+  }
+}
+
+/* Header */
+header{
+  text-align:center;
+  padding:38px 18px 30px;
+}
+.logo{
+  width:82px;
+  height:82px;
+  margin:auto;
+  border-radius:25px;
+  background:linear-gradient(135deg,#071b3a,#0a6f9e);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:50px;
+  font-weight:bold;
+  color:#20d6c7;
+  box-shadow:
+    0 0 25px rgba(32,214,199,.35),
+    0 12px 35px rgba(0,0,0,.4);
+  animation:logoFloat 6s ease-in-out infinite;
+}
+
+@keyframes logoFloat{
+  0%,100%{transform:translateY(0) rotate(0deg);}
+  50%{transform:translateY(-7px) rotate(2deg);}
+}
+
+.brand{
+  margin-top:16px;
+  font-size:38px;
+  font-weight:800;
+  letter-spacing:2px;
+  animation:brandGlow 6s ease-in-out infinite, brandFloat 8s ease-in-out infinite;
+}
+@keyframes brandFloat{
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-3px);
+  }
+}
+
+@keyframes brandGlow{
+  0%,100%{
+    text-shadow:0 0 8px rgba(32,214,199,.2);
+  }
+  50%{
+    text-shadow:
+      0 0 12px rgba(32,214,199,.6),
+      0 0 30px rgba(7,87,166,.6);
+  }
+}
+
+.tagline{
+  margin-top:8px;
+  color:#b9d7ee;
+  font-size:15px;
+}
+
+/* Main */
+.container{
+  width:min(720px,92%);
+  margin:auto;
+}
+
+.welcome{
+  text-align:center;
+  margin:15px 0 22px;
+}
+
+.welcome h2{
+  font-size:25px;
+  margin-bottom:9px;
+}
+
+.welcome p{
+  color:#a9bdd0;
+  line-height:1.6;
+}
+
+/* Input */
+.input-box{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(32,214,199,.28);
+  padding:16px;
+  border-radius:24px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 15px 40px rgba(0,0,0,.25);
+}
+
+textarea{
+  width:100%;
+  min-height:135px;
+  padding:16px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:16px;
+  resize:vertical;
+  font-size:16px;
+  outline:none;
+  color:#fff;
+  background:rgba(0,0,0,.25);
+}
+
+textarea::placeholder{
+  color:#8fa8bd;
+}
+textarea:focus{
+  border-color:#20d6c7;
+  box-shadow:
+    0 0 0 3px rgba(32,214,199,.12),
+    0 0 22px rgba(32,214,199,.18);
+}
+
+/* Button */
+button{
+  width:100%;
+  margin-top:12px;
+  padding:16px;
+  border:none;
+  border-radius:15px;
+  background:linear-gradient(135deg,#0878bd,#0a9b91);
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+  transition:.2s;
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+button:hover{
+  filter:brightness(1.1);
+}
+
+/* Loading */
+.loading{
+  display:none;
+  text-align:center;
+  margin:18px 0;
+  color:#20d6c7;
+  font-weight:bold;
+}
+
+/* Result */
+.result{
+  display:none;
+  margin-top:22px;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.14);
+  padding:22px;
+  border-radius:20px;
+  border-left:4px solid #20d6c7;
+  box-shadow:0 15px 40px rgba(0,0,0,.25);
+  backdrop-filter:blur(12px);
+}
+
+.result-title{
+  color:#20d6c7;
+  font-size:19px;
+  margin-bottom:16px;
+}
+
+.answer{
+  color:#e8f2f8;
+  line-height:1.75;
+  font-size:16px;
+}
+
+.answer h4{
+  color:#20d6c7;
+  margin:18px 0 8px;
+}
+
+.answer .step{
+  margin:10px 0;
+  padding:10px 12px;
+  background:rgba(255,255,255,.05);
+  border-radius:10px;
+}
+
+/* Feature cards */
+.cards{
+  display:grid;
+  gap:14px;
+  margin-top:28px;
+}
+
+.card{
+  opacity:0;
+  transform:translateY(20px) rotateX(90deg);
+}
+
+.card.cards-show{
+  animation:cardReveal .8s ease-out forwards;
+}
+
+@keyframes cardReveal{
+  0%{
+    opacity:0;
+    transform:translateY(20px) rotateX(90deg);
+  }
+  100%{
+    opacity:1;
+    transform:translateY(0) rotateX(0deg);
+  }
+}
+
+.card{
+  padding:20px;
+  border-radius:19px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  transition:.25s;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(32,214,199,.5);
+}
+
+.card h3{
+  margin-bottom:8px;
+}
+
+.card p{
+  color:#abc0d0;
+  line-height:1.6;
+}
+
+/* Footer */
+footer{
+  text-align:center;
+  padding:35px 15px;
+  color:#7890a4;
+  font-size:13px;
+}
+
+@media(max-width:500px){
+  body::before{
+    animation:none;
+  }
+  .input-box,
+  .result,
+  .card,
+  .language-selector select{
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+  .brand{
+    font-size:32px;
+  }
+
+  .welcome h2{
+    font-size:22px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="language-selector">
+    <label for="language">🌐</label>
+    <select id="language" aria-label="Chagua lugha">
+        <option value="sw">Kiswahili</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+        <option value="pt">Português</option>
+        <option value="ar">العربية</option>
+    </select>
+</div>
+
+<header>
+
+  <div class="logo">N</div>
+
+  <div class="brand">NGAMBEKI</div>
+
+  <p class="tagline" id="tagline">Internet ya Kukusaidia 🌍</p>
+
+</header>
+
+<div class="container">
+
+  <div class="welcome">
+
+    <h2 id="welcomeTitle">Unahitaji msaada gani leo? 😊</h2>
+
+    <p id="description">
+      Eleza tatizo, swali au jambo unalotaka kufanya.
+      Ngambeki itakusaidia kulielewa na kulitatua.
+    </p>
+
+  </div>
+
+  <div class="input-box">
+
+<textarea
+    id="question"
+    name="question"
+    rows="5"
+    maxlength="1000"
+    placeholder="Andika unachotafuta au unachotaka kujifunza hapa... Mfano: Nataka kuanzisha biashara ya nguo."
+    aria-label="Andika swali au jambo unalohitaji msaada"
+></textarea>
+    <button type="button" onclick="askNgambeki()" aria-label="Tafuta na unisaidie">
+      🔎 Tafuta & Nisaidie
+    </button>
+
+  </div>
+
+  <div class="loading" id="loading">
+    Ngambeki inafikiria...
+  </div>
+
+  <div class="result" id="result">
+
+    <div class="result-title">
+      💬 Ngambeki AI
+    </div>
+
+<div class="answer" id="answer" aria-live="polite"></div>
+  </div>
+
+  <div class="cards">
+
+    <div class="card" onclick="selectNgambekiMode('nitafutie')">
+     <h3 id="findTitle">🔎 NITAFUTIE</h3>
+      <p>
+        <span id="findDesc">Tafuta bidhaa, huduma, wauzaji na taarifa muhimu kwa njia rahisi.</span>
+      </p>
+    </div>
+
+    <div class="card" onclick="selectNgambekiMode('fanya')">
+      <h3 id="easyTitle">⚡ 
+FANYA KWA URAHISI</h3>
+      <p>
+        <span id="easyDesc">Pata maelekezo ya hatua kwa hatua ya kufanya jambo unalotaka.</span>
+      </p>
+    </div>
+
+    <div class="card" onclick="selectNgambekiMode('angaza')">
+      <h3 id="angazaTitle">🛰️ ANGAZA</h3>
+      <p>
+        <span id="angazaDesc">Tumia data, ramani na teknolojia kusaidia kuelewa dunia vizuri zaidi.</span>
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Ngambeki — Internet ya Kukusaidia 🌍
+</footer>
+
+<script>
+
+function formatAnswer(text){
+
+  let html = text
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+
+  html = html.replace(
+    /\*\*(.*?)\*\*/g,
+    "<strong>$1</strong>"
+  );
+
+  html = html.replace(
+    /^### (.*)$/gm,
+    "<h4>$1</h4>"
+  );
+
+  html = html.replace(
+    /^## (.*)$/gm,
+    "<h4>$1</h4>"
+  );
+
+  html = html.replace(
+    /^# (.*)$/gm,
+    "<h4>$1</h4>"
+  );
+
+  html = html.replace(
+    /^\s*(\d+)\.\s+(.*)$/gm,
+    '<div class="step"><strong>$1.</strong> $2</div>'
+  );
+
+  html = html.replace(
+    /^\s*[-•]\s+(.*)$/gm,
+    '<div class="step">• $1</div>'
+  );
+
+  html = html.replace(/\n{2,}/g,"<br><br>");
+  html = html.replace(/\n/g,"<br>");
+
+  return html;
+}
+
+async function askNgambeki(){
+
+  const question =
+    document.getElementById("question").value.trim();
+
+  const language =
+    document.getElementById("language").value;
+  const result =
+    document.getElementById("result");
+
+  const answer =
+    document.getElementById("answer");
+
+  const loading =
+    document.getElementById("loading");
+
+  if(!question){
+
+    result.style.display="block";
+
+    answer.innerHTML =
+      "😊 Tafadhali niambie unahitaji msaada gani.";
+
+    return;
+  }
+
+  loading.style.display="block";
+  result.style.display="none";
+
+  try{
+
+    const response = await fetch(
+      "http://localhost:3000/ask",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          question:question,
+          language:language
+        })
+      }
+    );
+      
+    if (!response.ok) {
+  throw new Error("HTTP_" + response.status);
+}
+
+const data = await response.json();
+
+loading.style.display = "none";
+result.style.display = "block";
+
+if (data.answer === "AI_CREDITS_EXHAUSTED") {
+
+  const creditMessages = {
+    sw: "😔 Samahani, huduma ya Ngambeki AI haipatikani kwa sasa. Tafadhali jaribu tena baadaye.",
+    en: "😔 Sorry, Ngambeki AI is not available right now. Please try again later.",
+    fr: "😔 Désolé, Ngambeki AI n’est pas disponible pour le moment. Veuillez réessayer plus tard.",
+    pt: "😔 Desculpe, o Ngambeki AI não está disponível no momento. Tente novamente mais tarde.",
+    ar: "😔 عذرًا، خدمة Ngambeki AI غير متاحة حاليًا. يرجى المحاولة مرة أخرى لاحقًا."
+  };
+
+  answer.innerHTML =
+    creditMessages[language] || creditMessages.sw;
+
+} else if (data.answer === "AI_UNAVAILABLE") {
+
+  const unavailableMessages = {
+    sw: "😔 Samahani, Ngambeki AI haipatikani kwa sasa. Tafadhali jaribu tena baadaye.",
+    en: "😔 Sorry, Ngambeki AI is not available right now. Please try again later.",
+    fr: "😔 Désolé, Ngambeki AI n’est pas disponible pour le moment. Veuillez réessayer plus tard.",
+    pt: "😔 Desculpe, o Ngambeki AI não está disponível no momento. Tente novamente mais tarde.",
+    ar: "😔 عذرًا، خدمة Ngambeki AI غير متاحة حاليًا. يرجى المحاولة مرة أخرى لاحقًا."
+  };
+
+  answer.innerHTML =
+    unavailableMessages[language] || unavailableMessages.sw;
+
+} else {
+
+  answer.innerHTML =
+    formatAnswer(data.answer);
+
+}
+
+result.scrollIntoView({
+  behavior: "smooth",
+  block: "start"
+});
+
+ }catch(error){
+
+    loading.style.display="none";
+    result.style.display="block";
+
+    const language = document.getElementById("language").value;
+
+    const errorMessages = {
+      sw: "😔 Samahani, Ngambeki AI haipatikani kwa sasa. Tafadhali jaribu tena baadaye.",
+      en: "😔 Sorry, Ngambeki AI is not available right now. Please try again later.",
+      fr: "😔 Désolé, Ngambeki AI n’est pas disponible pour le moment. Veuillez réessayer plus tard.",
+      pt: "😔 Desculpe, o Ngambeki AI não está disponível no momento. Tente novamente mais tarde.",
+      ar: "😔 عذرًا، خدمة Ngambeki AI غير متاحة حاليًا. يرجى المحاولة مرة أخرى لاحقًا."
+    };
+
+    answer.innerHTML =
+      errorMessages[language] || errorMessages.sw;
+
+  }
+
+}
+function selectNgambekiMode(mode) {
+    const question = document.getElementById("question");
+    const language = document.getElementById("language").value;
+    const t = translations[language] || translations.sw;
+
+    if (!question) return;
+
+    if (mode === "nitafutie") {
+        question.value = t.findMode;
+        question.focus();
+    }
+    else if (mode === "fanya") {
+        question.value = t.easyMode;
+        question.focus();
+    }
+    else if (mode === "angaza") {
+        question.value = t.angazaMode;
+        question.focus();
+    }
+}
+const translations = {
+  sw: {
+    search: "Tafuta & Nisaidie",
+    thinking: "Ngambeki inafikiria...",
+    placeholder: "Andika unachotafuta au unachotaka kujifunza hapa...",
+    find: "NITAFUTIE",
+    easy: "FANYA KWA URAHISI",
+    findMode: "NITAFUTIE: ",
+    easyMode: "FANYA KWA URAHISI: ",
+    angazaMode: "ANGAZA: ",
+    language: "Chagua lugha",
+    tagline: "Internet ya Kukusaidia 🌍",
+    title: "Unahitaji msaada gani leo? 😊",
+    description: "Eleza tatizo, swali au jambo unalotaka kufanya. Ngambeki itakusaidia kulielewa na kulitatua.",
+    findDesc: "Tafuta bidhaa, huduma, wauzaji na taarifa muhimu kwa njia rahisi.",
+    angazaDesc: "Tumia data, ramani na teknolojia kusaidia kuelewa dunia vizuri zaidi.",
+    easyDesc: "Pata maelekezo ya hatua kwa hatua ya kufanya jambo unalotaka.",
+    angazaTitle: "ANGAZA",
+  },
+
+  en: {
+    search: "Search & Help Me",
+    thinking: "Ngambeki is thinking...",
+    placeholder: "Write what you're looking for or want to learn here...",
+    find: "FIND IT FOR ME",
+    easy: "DO IT EASILY",
+    findMode: "FIND IT FOR ME: ",
+    easyMode: "DO IT EASILY: ",
+    angazaMode: "EXPLORE: ",
+    language: "Choose language",
+    tagline: "Internet That Helps You 🌍",
+    title: "What do you need help with today? 😊",
+    description: "Explain your problem, question, or what you want to do. Ngambeki will help you understand and solve it.",
+    angazaDesc: "Use data, maps and technology to better understand the world.",
+    findDesc: "Find products, services, sellers and useful information easily.",
+    angazaTitle: "EXPLORE",
+    easyDesc: "Get step-by-step instructions for doing what you want."
+  },
+
+  fr: {
+    search: "Rechercher & M'aider",
+    thinking: "Ngambeki réfléchit...",
+    placeholder: "Écrivez ce que vous recherchez ou souhaitez apprendre ici...",
+    find: "TROUVEZ-LE POUR MOI",
+    easy: "FAIRE FACILEMENT",
+    findMode: "TROUVEZ-LE POUR MOI : ",
+    easyMode: "FAIRE FACILEMENT : ",
+    angazaMode: "EXPLORER : ",
+    language: "Choisir la langue",
+    tagline: "Internet qui vous aide 🌍",
+    title: "De quelle aide avez-vous besoin aujourd'hui ? 😊",
+    angazaDesc: "Utilisez les données, les cartes et la technologie pour mieux comprendre le monde.",
+    description: "Expliquez votre problème, votre question ou ce que vous voulez faire. Ngambeki vous aidera à le comprendre et à le résoudre.",
+    angazaTitle: "EXPLORER",
+    findDesc: "Trouvez facilement des produits, services, vendeurs et informations utiles.",
+    easyDesc: "Obtenez des instructions étape par étape pour faire ce que vous voulez."
+  },
+
+  pt: {
+    search: "Pesquisar e Ajudar",
+    thinking: "Ngambeki está pensando...",
+    placeholder: "Escreva o que procura ou quer aprender aqui...",
+    find: "ENCONTRE PARA MIM",
+    easy: "FAZER COM FACILIDADE",
+    findMode: "ENCONTRE PARA MIM: ",
+    easyMode: "FAZER COM FACILIDADE: ",
+    angazaMode: "EXPLORAR: ",
+    language: "Escolher idioma",
+    tagline: "Internet que ajuda você 🌍",
+    angazaDesc: "Use dados, mapas e tecnologia para compreender melhor o mundo.",
+    title: "De que ajuda você precisa hoje? 😊",
+    angazaTitle: "EXPLORAR",
+    description: "Explique seu problema, sua pergunta ou o que deseja fazer. Ngambeki ajudará você a entender e resolver.",
+    findDesc: "Encontre facilmente produtos, serviços, vendedores e informações úteis.",
+    easyDesc: "Obtenha instruções passo a passo para fazer o que deseja."
+  },
+
+  ar: {
+    search: "ابحث وساعدني",
+    thinking: "Ngambeki يفكر...",
+    placeholder: "اكتب ما تبحث عنه أو ما تريد تعلمه هنا...",
+    find: "ابحث لي",
+    easy: "افعل ذلك بسهولة",
+    findMode: "ابحث لي: ",
+    easyMode: "افعل ذلك بسهولة: ",
+    angazaMode: "استكشف: ",
+    language: "اختر اللغة",
+    angazaDesc: "استخدم البيانات والخرائط والتكنولوجيا لفهم العالم بشكل أفضل.",
+    tagline: "إنترنت يساعدك 🌍",
+    angazaTitle: "استكشف",
+    title: "ما الذي تحتاج إلى مساعدة فيه اليوم؟ 😊",
+    description: "اشرح مشكلتك أو سؤالك أو ما تريد القيام به. سيساعدك Ngambeki على فهمه وحله.",
+    findDesc: "ابحث بسهولة عن المنتجات والخدمات والبائعين والمعلومات المفيدة.",
+    easyDesc: "احصل على تعليمات خطوة بخطوة للقيام بما تريد."
+  }
+};
+
+function applyLanguage() {
+    const language = document.getElementById("language").value;
+    const t = translations[language];
+
+    if (!t) return;
+
+    document.querySelector("button").textContent = "🔎 " + t.search;
+    document.getElementById("loading").textContent = t.thinking;
+    document.getElementById("question").placeholder = t.placeholder;
+    document.getElementById("tagline").textContent = t.tagline;
+    document.getElementById("welcomeTitle").textContent = t.title;
+    document.getElementById("description").textContent = t.description;
+    document.getElementById("findTitle").textContent = "🔎 " + t.find;
+    document.getElementById("angazaTitle").textContent = "🛰️ " + t.angazaTitle;
+    document.getElementById("easyTitle").textContent = "⚡ " + t.easy;
+    document.getElementById("angazaDesc").textContent = t.angazaDesc;
+    document.getElementById("findDesc").textContent = t.findDesc;
+    document.getElementById("easyDesc").textContent = t.easyDesc;
+    const question = document.getElementById("question");
+
+    if (question && question.value) {
+        const modePrefixes = {
+            nitafutie: [
+                "NITAFUTIE: ",
+                "FIND IT FOR ME: ",
+                "TROUVEZ-LE POUR MOI : ",
+                "ENCONTRE PARA MIM: ",
+                "ابحث لي: "
+            ],
+            fanya: [
+                "FANYA KWA URAHISI: ",
+                "DO IT EASILY: ",
+                "FAIRE FACILEMENT : ",
+                "FAZER COM FACILIDADE: ",
+                "افعل ذلك بسهولة: "
+            ],
+            angaza: [
+                "ANGAZA: ",
+                "EXPLORE: ",
+                "EXPLORER : ",
+                "EXPLORAR: ",
+                "استكشف: "
+            ]
+        };
+
+        for (const mode in modePrefixes) {
+            const oldPrefix = modePrefixes[mode].find(
+                prefix => question.value.startsWith(prefix)
+            );
+
+            if (oldPrefix) {
+                question.value =
+                    t[mode + "Mode"] +
+                    question.value.slice(oldPrefix.length);
+                break;
+            }
+        }
+    }
+}
+
+document.getElementById("language").addEventListener("change", applyLanguage);
+applyLanguage();
+const cardsSection = document.querySelector(".cards");
+
+if (cardsSection) {
+  const cards = cardsSection.querySelectorAll(".card");
+
+  const cardsObserver = new IntersectionObserver((entries, observer) => {
+    if (entries[0].isIntersecting) {
+
+      setTimeout(() => {
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.classList.add("cards-show");
+          }, index * 450);
+        });
+      }, 1000);
+
+      observer.disconnect();
+    }
+  }, {
+    threshold: 0.2
+  });
+
+  cardsObserver.observe(cardsSection);
+}
+
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js")
+      .then(() => {
+        console.log("Ngambeki Service Worker imewashwa");
+      })
+      .catch(error => {
+        console.error("Service Worker error:", error);
+      });
+  });
+}
+</script>
+</body>
+</html>
