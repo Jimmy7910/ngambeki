@@ -1,4 +1,4 @@
-const CACHE_NAME = "ngambeki-v1";
+const CACHE_NAME = "ngambeki-v2";
 
 const FILES_TO_CACHE = [
   "/",

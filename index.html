@@ -278,11 +278,8 @@ button:hover{
 }
 
 .card{
-  opacity:0;
-  transform:translateY(20px) rotateX(90deg);
-}
-
-.card.cards-show{
+  opacity:1;
+  transform:translateY(0) rotateX(0);
   animation:cardReveal .8s ease-out forwards;
 }
 
@@ -719,7 +716,8 @@ const translations = {
     angazaTitle: "استكشف",
     title: "ما الذي تحتاج إلى مساعدة فيه اليوم؟ 😊",
     description: "اشرح مشكلتك أو سؤالك أو ما تريد القيام به. سيساعدك Ngambeki على فهمه وحله.",
-    findDesc: "ابحث بسهولة عن المنتجات والخدمات والبائعين والمعلومات المفيدة.",
+    findDdocument.documentElement.lang = language;
+document.documentElement.dir = language === "ar" ? "rtl" : "ltr";esc: "ابحث بسهولة عن المنتجات والخدمات والبائعين والمعلومات المفيدة.",
     easyDesc: "احصل على تعليمات خطوة بخطوة للقيام بما تريد."
   }
 };
@@ -727,6 +725,9 @@ const translations = {
 function applyLanguage() {
     const language = document.getElementById("language").value;
     const t = translations[language];
+
+document.documentElement.lang = language;
+document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
 
     if (!t) return;
 
