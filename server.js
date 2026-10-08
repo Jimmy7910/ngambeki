@@ -10,9 +10,24 @@ const pool = new Pool({
     rejectUnauthorized: false
   }
 });
-pool.query("SELECT 1")
-  .then(() => console.log("POSTGRES OK"))
-  .catch(() => console.log("POSTGRES ERROR"));
+pool.query(`
+  CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS search_history (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    question TEXT NOT NULL,
+    language VARCHAR(10) DEFAULT 'sw',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`)
+  .then(() => console.log("DATABASE TABLES OK"))
+  .catch(() => console.log("DATABASE TABLES ERROR"));
 
 const PORT = process.env.PORT || 3000;
 
