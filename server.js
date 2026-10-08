@@ -10,6 +10,10 @@ const pool = new Pool({
     rejectUnauthorized: false
   }
 });
+pool.query("SELECT 1")
+  .then(() => console.log("POSTGRES OK"))
+  .catch(() => console.log("POSTGRES ERROR"));
+
 const PORT = process.env.PORT || 3000;
 
 const client = new OpenAI({
