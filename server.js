@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const OpenAI = require("openai");
 const { Pool } = require("pg");
+const crypto = require("crypto");
 const app = express();
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -35,6 +36,13 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+
+  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
+
+  return `${salt}:${hash}`;
+}
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -52,6 +60,46 @@ app.use((req, res, next) => {
 
 app.use(express.static(__dirname));
 
+app.post("/signup", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Email na password vinahitajika."
+    });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({
+      message: "Password iwe na angalau herufi 8."
+    });
+  }
+
+  try {
+    const passwordHash = hashPassword(password);
+
+    await pool.query(
+      "INSERT INTO users (email, password_hash) VALUES ($1, $2)",
+      [email.trim().toLowerCase(), passwordHash]
+    );
+
+    res.json({
+      message: "Akaunti imeundwa."
+    });
+
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({
+        message: "Email hiyo tayari imesajiliwa."
+      });
+    }
+
+    console.error("SIGNUP ERROR");
+    res.status(500).json({
+      message: "Imeshindikana kutengeneza akaunti."
+    });
+  }
+});
 app.post("/ask", async (req, res) => {
   const question = req.body.question;
   const language = req.body.language || "sw";
