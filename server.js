@@ -109,7 +109,7 @@ app.post("/login", async (req, res) => {
     });
 
   } catch (error) {
-    console.error("LOGIN ERROR");
+    console.error("LOGIN ERROR:", error.message, error.code || "");
     res.status(500).json({
       message: "Imeshindikana kuingia."
     });
