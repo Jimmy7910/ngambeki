@@ -37,7 +37,18 @@ const client = new OpenAI({
 });
 
 function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString("hex");
+  
+function verifyPassword(password, storedPassword) {
+  const [salt, storedHash] = storedPassword.split(":");
+
+  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
+
+  return crypto.timingSafeEqual(
+    Buffer.from(hash, "hex"),
+    Buffer.from(storedHash, "hex")
+  );
+}
+const salt = crypto.randomBytes(16).toString("hex");
 
   const hash = crypto.scryptSync(password, salt, 64).toString("hex");
 
@@ -60,6 +71,50 @@ app.use((req, res, next) => {
 
 app.use(express.static(__dirname));
 
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Email na password vinahitajika."
+    });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT id, email, password_hash FROM users WHERE email = $1",
+      [email.trim().toLowerCase()]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        message: "Email au password si sahihi."
+      });
+    }
+
+    const user = result.rows[0];
+
+    if (!verifyPassword(password, user.password_hash)) {
+      return res.status(401).json({
+        message: "Email au password si sahihi."
+      });
+    }
+
+    res.json({
+      message: "Umeingia kikamilifu.",
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    console.error("LOGIN ERROR");
+    res.status(500).json({
+      message: "Imeshindikana kuingia."
+    });
+  }
+});
 app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
 
