@@ -85,6 +85,99 @@ body::after{
   }
 }
 
+/* Ngambeki Account Panel */
+.account-panel {
+  width: calc(100% - 36px);
+  max-width: 440px;
+  margin: 0 auto 28px;
+  padding: 24px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.22);
+  color: #ffffff;
+}
+
+#accountStatus {
+  margin-bottom: 18px;
+  text-align: center;
+  font-size: 15px;
+  color: #b8f5ef;
+}
+
+#accountForm label {
+  display: block;
+  margin: 14px 0 7px;
+  font-size: 14px;
+  color: #e2e8f0;
+}
+
+#accountEmail,
+#accountPassword {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(2, 8, 23, 0.55);
+  color: #ffffff;
+  font-size: 16px;
+  outline: none;
+}
+
+#accountEmail:focus,
+#accountPassword:focus {
+  border-color: #35d6c5;
+  box-shadow: 0 0 0 3px rgba(53, 214, 197, 0.15);
+}
+
+.account-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.account-buttons button {
+  flex: 1 1 120px;
+  min-height: 44px;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #087f8c, #0bb5a8);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-buttons button:active {
+  transform: scale(0.98);
+}
+
+.account-buttons button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+#logoutButton {
+  background: #344256;
+}
+
+#accountMessage {
+  margin: 14px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#accountMessage:empty {
+  display: none;
+}
 /* Header */
 header{
   text-align:center;
@@ -371,6 +464,65 @@ footer{
   <p class="tagline" id="tagline">Internet ya Kukusaidia 🌍</p>
 
 </header>
+<div class="account-panel" id="accountPanel">
+
+  <div id="accountStatus" role="status" aria-live="polite">
+    Hujaingia kwenye akaunti.
+  </div>
+
+  <form id="accountForm">
+
+    <label for="accountEmail" id="accountEmailLabel">Email</label>
+
+    <input
+      type="email"
+      id="accountEmail"
+      name="email"
+      autocomplete="email"
+      required
+    >
+
+    <label for="accountPassword" id="passwordLabel">
+      Nenosiri
+    </label>
+
+    <input
+      type="password"
+      id="accountPassword"
+      name="password"
+      autocomplete="current-password"
+      required
+    >
+
+    <div class="account-buttons">
+
+      <button type="submit" id="loginButton">
+        Ingia
+      </button>
+
+      <button type="button" id="signupButton">
+        Jisajili
+      </button>
+
+      <button type="button" id="logoutButton" hidden>
+        Toka kwenye akaunti
+      </button>
+
+    </div>
+
+  </form>
+
+  <p id="accountMessage" role="status" aria-live="polite"></p>
+
+</div>
+
+<section class="account-panel" id="historyPanel" hidden aria-labelledby="historyTitle">
+  <h2 id="historyTitle">Historia Yangu</h2>
+  <p id="historyDescription">Maswali uliyouliza ukiwa umeingia kwenye akaunti yako.</p>
+  <button type="button" id="refreshHistoryButton">🔄 Sasisha historia</button>
+  <p id="historyMessage" role="status" aria-live="polite"></p>
+  <ol id="historyList"></ol>
+</section>
 
 <div class="container">
 
@@ -395,7 +547,7 @@ footer{
     placeholder="Andika unachotafuta au unachotaka kujifunza hapa... Mfano: Nataka kuanzisha biashara ya nguo."
     aria-label="Andika swali au jambo unalohitaji msaada"
 ></textarea>
-    <button type="button" onclick="askNgambeki()" aria-label="Tafuta na unisaidie">
+    <button type="button" id="askButton" onclick="askNgambeki()" aria-label="Tafuta na unisaidie">
       🔎 Tafuta & Nisaidie
     </button>
 
@@ -424,7 +576,7 @@ footer{
     </div>
 
     <div class="card" onclick="selectNgambekiMode('fanya')">
-      <h3 id="easyTitle">⚡ 
+      <h3 id="easyTitle">⚡
 FANYA KWA URAHISI</h3>
       <p>
         <span id="easyDesc">Pata maelekezo ya hatua kwa hatua ya kufanya jambo unalotaka.</span>
@@ -535,7 +687,7 @@ async function askNgambeki(){
         })
       }
     );
-      
+
     if (!response.ok) {
   throw new Error("HTTP_" + response.status);
 }
@@ -716,7 +868,7 @@ const translations = {
     angazaTitle: "استكشف",
     title: "ما الذي تحتاج إلى مساعدة فيه اليوم؟ 😊",
     description: "اشرح مشكلتك أو سؤالك أو ما تريد القيام به. سيساعدك Ngambeki على فهمه وحله.",
-    findDesc: "ابحث بسهولة عن المنتجات والخدمات والبائعين والمعلومات المفيدة.", 
+    findDesc: "ابحث بسهولة عن المنتجات والخدمات والبائعين والمعلومات المفيدة.",
     easyDesc: "احصل على تعليمات خطوة بخطوة للقيام بما تريد."
   }
 };
@@ -730,7 +882,8 @@ document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
 
     if (!t) return;
 
-    document.querySelector("button").textContent = "🔎 " + t.search;
+
+    document.getElementById("askButton").textContent = "🔎 " + t.search;
     document.getElementById("loading").textContent = t.thinking;
     document.getElementById("question").placeholder = t.placeholder;
     document.getElementById("tagline").textContent = t.tagline;
@@ -826,5 +979,6 @@ if ("serviceWorker" in navigator) {
   });
 }
 </script>
+<script src="/account.js" defer></script>
 </body>
 </html>
