@@ -69,19 +69,29 @@ function verifyPassword(password, storedPassword) {
 
 app.use(express.json());
 
-const allowedOrigin = "https://ngambeki-production.up.railway.app";
+const allowedOrigins = new Set([
+  "https://ngambeki-production.up.railway.app",
+  "https://ngambeki-production-610f.up.railway.app",
+  ...(process.env.RAILWAY_PUBLIC_DOMAIN
+    ? ["https://" + process.env.RAILWAY_PUBLIC_DOMAIN]
+    : []),
+  ...(process.env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean)
+]);
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (origin && origin !== allowedOrigin) {
+  if (origin && !allowedOrigins.has(origin)) {
     return res.status(403).json({
       message: "Origin haijaruhusiwa."
     });
   }
 
-  if (origin === allowedOrigin) {
-    res.header("Access-Control-Allow-Origin", allowedOrigin);
+  if (origin) {
+    res.header("Access-Control-Allow-Origin", origin);
     res.header("Vary", "Origin");
     res.header("Access-Control-Allow-Headers", "Content-Type");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
